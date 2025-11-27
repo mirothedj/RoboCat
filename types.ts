@@ -28,6 +28,9 @@ export interface LevelData {
   title: string;
   missionBrief: string;
   missionGoal: string;
+  // NEW: The "Bill of Materials" Template. 
+  // Maps the generic part (e.g. HEAD) to the specific Lesson Component (e.g. "The Canvas")
+  anatomyLabels?: Partial<Record<PartType, string>>;
   requirements: Record<PartType, LevelRequirement>;
   availableOptions: {
     [key in PartType]?: Array<{ id: string; label: string }>;

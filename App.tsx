@@ -141,6 +141,9 @@ export default function App() {
            <div className="space-y-3">
             {Object.values(PARTS_INFO).map((part) => {
                 const colorHex = THEME_COLORS[part.colorTheme];
+                // TEMPLATE: Get the Lesson-Specific Label (e.g., "The Controls") or fallback to Name
+                const lessonLabel = currentLevelData.anatomyLabels?.[part.type] || part.name;
+                
                 return (
                 <div key={part.id} className="group relative pl-2 hover:bg-slate-800/30 rounded transition-colors py-1 cursor-default">
                     {/* Vertical Color Bar */}
@@ -151,9 +154,11 @@ export default function App() {
                     
                     <div>
                         <div className="text-[10px] font-bold neon-text-cyan uppercase flex flex-col gap-0.5">
-                            <span className="text-cyan-200 group-hover:text-white transition-colors">{part.name}</span>
+                            {/* Primary: The Lesson Term */}
+                            <span className="text-cyan-200 group-hover:text-white transition-colors">{lessonLabel}</span>
+                            {/* Secondary: The Robot Part Name */}
                             <span className="text-[8px] font-normal normal-case text-slate-500 group-hover:text-cyan-400/70">
-                                {part.aiTerm}
+                                {part.name} ({part.aiTerm})
                             </span>
                         </div>
                         {/* Tooltip description */}

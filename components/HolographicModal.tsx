@@ -80,6 +80,9 @@ const HolographicModal: React.FC<HolographicModalProps> = ({ part, levelData, on
   const requirement = levelData.requirements[part.type];
   const options = levelData.availableOptions[part.type];
 
+  // TEMPLATE: Get the lesson-specific label for this part
+  const lessonLabel = levelData.anatomyLabels?.[part.type] || part.name;
+
   const handleSubmit = () => {
     let isValid = false;
 
@@ -111,8 +114,8 @@ const HolographicModal: React.FC<HolographicModalProps> = ({ part, levelData, on
           <div className="flex items-center gap-3">
              <div className={`w-2 h-8 rounded-full animate-pulse ${theme.pulse}`}></div>
              <div>
-               <h3 className={`${theme.text} tech-font text-xl tracking-wider uppercase`}>Configuring: {part.name}</h3>
-               <p className={`${theme.textDim} text-xs font-mono`}>{part.aiTerm}</p>
+               <h3 className={`${theme.text} tech-font text-xl tracking-wider uppercase`}>Configuring: {lessonLabel}</h3>
+               <p className={`${theme.textDim} text-xs font-mono`}>{part.name} // {part.aiTerm}</p>
              </div>
           </div>
           <button onClick={onClose} className={`${theme.text} hover:text-white transition-colors`}>
@@ -130,17 +133,17 @@ const HolographicModal: React.FC<HolographicModalProps> = ({ part, levelData, on
           <div className="mb-6">
             {part.type === PartType.TORSO ? (
               <div className="space-y-2">
-                 <label className={`${theme.text} text-xs font-bold uppercase tracking-widest`}>Enter System Instructions:</label>
+                 <label className={`${theme.text} text-xs font-bold uppercase tracking-widest`}>Enter Instructions ({lessonLabel}):</label>
                  <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder='e.g., "You are a helpful robot who..."'
+                  placeholder='e.g., "Initialize canvas, set variables..."'
                   className={`w-full h-32 bg-slate-950 border text-slate-200 p-4 rounded-lg focus:outline-none focus:ring-1 font-mono resize-none ${theme.border} ${theme.ring}`}
                  />
               </div>
             ) : (
               <div className="space-y-3">
-                <label className={`${theme.text} text-xs font-bold uppercase tracking-widest`}>Select Component Logic:</label>
+                <label className={`${theme.text} text-xs font-bold uppercase tracking-widest`}>Select {lessonLabel} Logic:</label>
                 <div className="grid gap-3">
                   {options?.map((opt) => (
                     <button
