@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Settings } from 'lucide-react';
 import { AssembledState, PartType } from '../types';
-import { PARTS_INFO, PART_PATHS, THEME_COLORS } from '../constants';
+import { PARTS_INFO, PART_PATHS, THEME_COLORS, PART_CENTERS } from '../constants';
 
 interface OverheadRailProps {
   assembledParts: AssembledState;
@@ -54,8 +54,16 @@ const OverheadRail: React.FC<OverheadRailProps> = ({ assembledParts, onPartSelec
         ) : (
           availableParts.map((part, index) => {
             const color = THEME_COLORS[part.colorTheme];
+            const center = PART_CENTERS[part.type];
             // Stagger animation delay so they don't sway in perfect unison
             const swayDelay = `${index * 0.2}s`;
+            
+            // Calculate Transform to zoom in and center the part
+            // 1. Translate part center to origin (-center.x, -center.y)
+            // 2. Scale up (3x)
+            // 3. Translate to center of viewBox (200, 225)
+            const zoomScale = 3.5;
+            const transform = `translate(200, 225) scale(${zoomScale}) translate(-${center.x}, -${center.y})`;
             
             return (
               <div 
@@ -73,22 +81,22 @@ const OverheadRail: React.FC<OverheadRailProps> = ({ assembledParts, onPartSelec
                 
                 {/* The Part Holder / Pod */}
                 <div 
-                  className="bg-slate-900/80 border-2 backdrop-blur-sm rounded-lg p-2 shadow-lg transition-all duration-300"
+                  className="bg-slate-900/80 border-2 backdrop-blur-sm rounded-lg p-2 shadow-lg transition-all duration-300 w-16 h-16 flex items-center justify-center overflow-hidden"
                   style={{ borderColor: color, boxShadow: `0 0 10px ${color}30` }}
                 >
-                    <svg width="40" height="40" viewBox="0 0 400 450" className="overflow-visible">
+                    <svg width="64" height="64" viewBox="0 0 400 450" className="overflow-visible">
                         <path 
                             d={PART_PATHS[part.type]} 
                             fill={color} 
                             stroke="white" 
-                            strokeWidth="10"
-                            transform="scale(0.8) translate(50, 50)" // Miniaturize the part for the icon
+                            strokeWidth="3"
+                            transform={transform}
                         />
                     </svg>
                 </div>
                 
                 {/* Label on Hover */}
-                <div className="absolute -bottom-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 px-2 py-1 rounded text-[10px] text-white whitespace-nowrap border border-slate-700">
+                <div className="absolute -bottom-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 px-2 py-1 rounded text-[10px] text-white whitespace-nowrap border border-slate-700 z-50">
                     {part.name}
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Brain, ScanEye, Cpu, Wrench, Network, MonitorUp } from 'lucide-react';
-import { PARTS_INFO, PART_PATHS, THEME_COLORS } from '../constants';
+import { PARTS_INFO, PART_PATHS, THEME_COLORS, PART_CENTERS } from '../constants';
 import { AssembledState, PartType } from '../types';
 
 interface RobotChassisProps {
@@ -9,22 +9,13 @@ interface RobotChassisProps {
   activeLevel: boolean;
 }
 
-// Center points for icons (Coordinates matched to SVG paths)
-const CENTERS = {
-  [PartType.HEAD]: { x: 200, y: 108 },
-  [PartType.TORSO]: { x: 200, y: 200 },
-  [PartType.ARM_LEFT]: { x: 125, y: 195 },
-  [PartType.ARM_RIGHT]: { x: 275, y: 195 },
-  [PartType.LEGS]: { x: 200, y: 315 },
-};
-
 const RobotChassis: React.FC<RobotChassisProps> = ({ assembledParts, onPartClick, activeLevel }) => {
   
   const renderPart = (type: PartType) => {
     const isInstalled = assembledParts[type];
     const partInfo = PARTS_INFO[type];
     const color = THEME_COLORS[partInfo.colorTheme] || '#22d3ee';
-    const center = CENTERS[type];
+    const center = PART_CENTERS[type];
     
     // Dynamic Icon
     const Icon = {
@@ -35,31 +26,35 @@ const RobotChassis: React.FC<RobotChassisProps> = ({ assembledParts, onPartClick
       'MonitorUp': MonitorUp
     }[partInfo.iconName] || Cpu;
 
-    // NOTE: Clicking logic is now primarily handled by the OverheadRail, 
-    // but we keep click-to-edit for installed parts.
     const isClickable = isInstalled && activeLevel;
 
     return (
       <g 
-        key={type}
+        key={`part-${type}-${isInstalled}`}
         onClick={() => isClickable && onPartClick(type)}
         className={`group transition-all duration-300 ${isClickable ? 'cursor-pointer' : ''}`}
-        style={{ opacity: isInstalled ? 1 : 0.3 }}
+        // Opacity 1 for both states to ensure maximum visibility of the outline
+        style={{ opacity: 1 }} 
       >
         {/* The Shape Path */}
         <path
           d={PART_PATHS[type]}
           fill={isInstalled ? color : 'transparent'}
-          stroke={isInstalled ? '#ffffff' : '#334155'} // Dark grey if empty
-          strokeWidth={isInstalled ? 2 : 1}
-          strokeDasharray={isInstalled ? 'none' : '4 4'}
-          className="transition-all duration-300"
+          // Bright Neon Cyan for empty, White for installed border
+          stroke={isInstalled ? '#ffffff' : '#22d3ee'} 
+          // Thicker stroke for empty state to be clearly visible
+          strokeWidth={isInstalled ? 2 : 2.5} 
+          strokeDasharray={isInstalled ? 'none' : '6 3'}
+          className={`transition-all duration-300 ${isInstalled ? 'animate-install-flash' : ''}`}
           style={{
-            filter: isInstalled ? `drop-shadow(0 0 10px ${color})` : 'none'
+            // Stronger glow effect for empty state
+            filter: isInstalled 
+                ? `drop-shadow(0 0 10px ${color})` 
+                : `drop-shadow(0 0 5px #22d3ee)` 
           }}
         />
 
-        {/* Inner Content (Icon/Text) */}
+        {/* Inner Content (Icon/Text) - Only when installed */}
         {isInstalled && (
             <foreignObject 
             x={center.x - 40} 
@@ -81,21 +76,23 @@ const RobotChassis: React.FC<RobotChassisProps> = ({ assembledParts, onPartClick
             </foreignObject>
         )}
         
-        {/* Placeholder for empty slot - optional visual cue */}
+        {/* Visual Cue for Empty Slot - A pulsing node at the center */}
         {!isInstalled && activeLevel && (
-             <circle cx={center.x} cy={center.y} r="4" fill="#334155" opacity="0.5" />
+             <circle cx={center.x} cy={center.y} r="4" fill="#22d3ee" className="animate-pulse" />
         )}
       </g>
     );
   };
 
   return (
-    <div className="relative w-full max-w-[500px] aspect-[4/5] flex items-center justify-center select-none">
+    // Updated Container: Added max-h-[70vh] to prevent it from being too tall and overlapping top/bottom elements
+    <div className="relative w-full h-full max-h-[65vh] aspect-[4/5] flex items-center justify-center select-none p-4">
       
       {/* SVG Container for the Mech */}
       <svg 
         viewBox="0 0 400 450" 
         className="w-full h-full drop-shadow-2xl"
+        preserveAspectRatio="xMidYMid meet"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
@@ -108,8 +105,8 @@ const RobotChassis: React.FC<RobotChassisProps> = ({ assembledParts, onPartClick
         {/* Ambient Back Glow */}
         <circle cx="200" cy="225" r="150" fill="url(#mech-glow)" />
 
-        {/* Connecting Wires (Background Layer) */}
-        <g stroke="#1e293b" strokeWidth="2" fill="none" opacity="0.5">
+        {/* Connecting Wires (Background Layer) - Brighter */}
+        <g stroke="#0e7490" strokeWidth="1.5" fill="none" opacity="0.6">
            <path d="M 200,135 L 200,140" />
            <path d="M 170,160 L 155,170" />
            <path d="M 230,160 L 245,170" />

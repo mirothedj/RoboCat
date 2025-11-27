@@ -17,6 +17,15 @@ export const PART_PATHS: Record<PartType, string> = {
   [PartType.LEGS]: "M 160,265 L 240,265 L 250,290 L 250,340 L 220,360 L 180,360 L 150,340 L 150,290 Z"
 };
 
+// Center points for icons (Coordinates matched to SVG paths)
+export const PART_CENTERS: Record<PartType, {x: number, y: number}> = {
+  [PartType.HEAD]: { x: 200, y: 108 },
+  [PartType.TORSO]: { x: 200, y: 200 },
+  [PartType.ARM_LEFT]: { x: 125, y: 195 },
+  [PartType.ARM_RIGHT]: { x: 275, y: 195 },
+  [PartType.LEGS]: { x: 200, y: 315 },
+};
+
 export const PARTS_INFO: Record<PartType, PartDefinition> = {
   [PartType.HEAD]: {
     id: 'head',
